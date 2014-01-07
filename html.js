@@ -1,7 +1,7 @@
 var http = require('http');
 var URL = require('url');
 
-exports.download = function (url, callback){
+function download(url, callback){
   var url_params = URL.parse(url);
   var options = {
     host: url_params.host,
@@ -9,7 +9,7 @@ exports.download = function (url, callback){
     port: '80'
   };
 
-  console.log("[GET_CONTENT] " + url);
+  // console.log("[GET_CONTENT] " + url);
   var request = http.get(options, function(res) {
     var str = "";
     res.on("data", function(chunk) {
@@ -20,4 +20,10 @@ exports.download = function (url, callback){
       callback(str);
     });
   });
+
+  request.on("error", function(err){
+    console.error("error downloading: "+url+". Trying again");
+    download(url, callback);
+  });
 }
+exports.download = download;
